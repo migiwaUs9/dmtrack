@@ -23,18 +23,23 @@ _JP_PATTERN = re.compile(
     r"[\u3040-\u309f"   # ひらがな
     r"\u30a0-\u30ff"    # カタカナ
     r"\u4e00-\u9fff"    # 漢字
-    r"\u3000-\u303f"    # 和文記号（・など）
-    r"！-～"            # 全角英数記号
+    r"A-Za-z0-9"        # 英数字
+    r"ぁ-んァ-ヶ"       # 濁点なども
     r"]+"
 )
 
-# ファジーマッチの類似度閾値（0〜1）
-_FUZZY_THRESHOLD = 0.65
-
-
 def _normalize(s: str) -> str:
-    """日本語文字のみ残して結合"""
-    return "".join(_JP_PATTERN.findall(s))
+    """ノイズを除去して正規化。OCRの揺れを最小限に抑える"""
+    if not s: return ""
+    # カタカナ、英数字、漢字のみ残す（記号・空白除去）
+    s = "".join(_JP_PATTERN.findall(s))
+    # 半角/全角の統一、大文字小文字の統一
+    s = s.translate(str.maketrans(
+        "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ",
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    )).upper()
+    # 長音と漢字の一を同一視するなどの高度な正規化は一旦保留（複雑化回避）
+    return s
 
 
 def _card_matches(ocr_name: str, deck_card: str) -> bool:
@@ -73,49 +78,49 @@ def collect_all_card_names(decks: dict) -> list[str]:
 
 
 def fuzzy_correct(ocr_text: str, card_names: list[str],
-                  threshold: float = 0.45) -> str | None:
+                  threshold: float = 0.60) -> str | None:
     """OCR結果を既知カード名リストでファジーマッチ補正する。
-    OCRはゴミ文字が混ざるため、スライドウィンドウでカード名長の部分文字列を
-    それぞれ比較し、最も類似度の高いカード名を返す。閾値未満なら None。
+    4000枚規模のリストに対して、高速な絞り込みを行いつつ補正を行う。
     """
     n_ocr = _normalize(ocr_text)
-    if not n_ocr:
+    if not n_ocr or len(n_ocr) < 2:  # 短すぎるのは無視
         return None
 
     best_name = None
     best_score = 0.0
 
+    # 1次フィルタ: 
+    # 短い方の文字列が長い方に含まれているかをチェック（高速）
     for card_name in card_names:
         n_card = _normalize(card_name)
-        if not n_card:
-            continue
+        if not n_card: continue
 
-        # 部分一致: カード名がOCR結果に含まれる or その逆
+        # 完全一致は即終了
+        if n_ocr == n_card:
+            return card_name
+
+        # 部分一致チェック
         if n_card in n_ocr or n_ocr in n_card:
+            # 長さの比率をスコアにする
             score = min(len(n_ocr), len(n_card)) / max(len(n_ocr), len(n_card))
-            # 部分一致はボーナス
-            score = min(score + 0.3, 1.0)
+            # 部分一致ボーナス
+            score += 0.2
             if score > best_score:
                 best_score = score
                 best_name = card_name
             continue
+            
+        # 編集距離ベースの簡易的なファジーマッチ（SequenceMatcherは重いので、
+        # ある程度確信が持てる場合のみ詳細計算するのが理想だが、
+        # まずはスライドウィンドウで全件チェック）
+        # ただし、文字数が大幅に違う場合はスキップして高速化
+        if abs(len(n_ocr) - len(n_card)) > 5:
+            continue
 
-        # スライドウィンドウ: OCR文字列からカード名長の部分を切り出して比較
-        # （OCRにゴミ文字が混ざるケースに対応）
-        card_len = len(n_card)
-        if len(n_ocr) >= card_len:
-            for i in range(len(n_ocr) - card_len + 1):
-                window = n_ocr[i:i + card_len]
-                ratio = SequenceMatcher(None, window, n_card).ratio()
-                if ratio > best_score:
-                    best_score = ratio
-                    best_name = card_name
-        else:
-            # OCRの方が短い場合: 全体で比較
-            ratio = SequenceMatcher(None, n_ocr, n_card).ratio()
-            if ratio > best_score:
-                best_score = ratio
-                best_name = card_name
+        ratio = SequenceMatcher(None, n_ocr, n_card).ratio()
+        if ratio > best_score:
+            best_score = ratio
+            best_name = card_name
 
     if best_score >= threshold:
         return best_name

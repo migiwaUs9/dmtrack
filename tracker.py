@@ -13,7 +13,6 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-import pytesseract
 import os
 import json
 import re
@@ -64,12 +63,16 @@ CARD_HIDE_THRESHOLD = 10.0
 # カードバナーのテキスト存在チェック閾値（black% がこれ以上でカード有りと判定）
 CARD_TEXT_MIN_PCT = 3.0
 
-# Tesseract設定
+# manga-ocr
+MANGA_OCR_ENABLED = True  # Falseに切り替えるとTesseractフォールバック
+
+# Tesseract設定（フォールバック用）
 TESSERACT_CMD = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 TESSDATA_DIR  = str(_BASE_DIR)  # jpn.traineddata がプロジェクトルートにある
 
 # pHash設定
 HASH_DB_PATH    = _BASE_DIR / "card_hashes.json"
+MASTER_DB_PATH  = _BASE_DIR / "cards_master.json"
 UNKNOWN_DIR     = _BASE_DIR / "cards_unknown"
 PHASH_SIZE      = 16
 PHASH_THRESHOLD = 15  # ハミング距離がこれ以下で同一カードと判定
@@ -247,6 +250,7 @@ class GameTracker:
         self._all_card_names: list[str] = []  # ファジーマッチ用
         self._hash_db: dict[str, str] = {}    # {hash文字列: カード名}
         self._last_card_hash: str | None = None  # 同一カード重複防止
+        self._mocr = None  # manga-ocrインスタンス
 
     # ── 初期化 ──────────────────────────────────
     def _init(self):
@@ -262,14 +266,33 @@ class GameTracker:
         self._emit("STATUS", msg="デッキ定義読み込み中...")
         try:
             self._decks = deck_engine.load_decks()
-            # 全カード名のマスターリストを構築（ファジーマッチ補正用）
-            self._all_card_names = deck_engine.collect_all_card_names(self._decks)
         except FileNotFoundError:
             self._emit("STATUS", msg="decks.json が見つかりません")
 
-        # Tesseract 設定
-        pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
-        os.environ["TESSDATA_PREFIX"] = TESSDATA_DIR
+        self._emit("STATUS", msg="カードマスター読み込み中...")
+        if MASTER_DB_PATH.exists():
+            with open(MASTER_DB_PATH, encoding="utf-8") as f:
+                master_data = json.load(f)
+                self._all_card_names = [c["name"] for c in master_data.get("cards", [])]
+            self._emit("STATUS", msg=f"マスターDB: {len(self._all_card_names)} 枚ロード")
+        else:
+            self._emit("STATUS", msg="cards_master.json が見つかりません")
+
+        # manga-ocrロード
+        if MANGA_OCR_ENABLED:
+            self._emit("STATUS", msg="manga-ocr モデルをロード中...")
+            try:
+                from manga_ocr import MangaOcr
+                self._mocr = MangaOcr()
+                self._emit("STATUS", msg="manga-ocr 準備完了")
+            except Exception as e:
+                self._emit("STATUS", msg=f"manga-ocr ロード失敗: {e} → Tesseractフォールバック")
+                self._mocr = None
+        else:
+            # Tesseract 設定
+            import pytesseract
+            pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
+            os.environ["TESSDATA_PREFIX"] = TESSDATA_DIR
 
         # カードハッシュDB読み込み
         self._load_hash_db()
@@ -549,42 +572,49 @@ class GameTracker:
 
         return best_name
 
-    # ── OCR（フォールバック）─────────────────────
+    # ── OCR（manga-ocr優先 / Tesseractフォールバック）──────
     def _ocr_card_name(self, frame: np.ndarray, ts: str = "") -> str:
         region = rel_crop(frame, CARD_NAME_REL)
+        pil_region = Image.fromarray(cv2.cvtColor(region, cv2.COLOR_BGR2RGB))
 
-        scale = 5
-        up = cv2.resize(region, (region.shape[1] * scale, region.shape[0] * scale),
-                        interpolation=cv2.INTER_CUBIC)
-        gray = cv2.cvtColor(up, cv2.COLOR_BGR2GRAY)
-        _, binary = cv2.threshold(gray, 160, 255, cv2.THRESH_BINARY)
-        padded = cv2.copyMakeBorder(binary, 30, 30, 30, 30,
-                                    cv2.BORDER_CONSTANT, value=0)
-        inverted = cv2.bitwise_not(padded)
+        if self._mocr is not None:
+            # manga-ocr: 前処理不要。PILイメージをそのまま渡す
+            raw = self._mocr(pil_region)
+            method_label = "manga_ocr"
+        else:
+            # Tesseract フォールバック
+            import pytesseract
+            scale = 5
+            up = cv2.resize(region, (region.shape[1] * scale, region.shape[0] * scale),
+                            interpolation=cv2.INTER_CUBIC)
+            gray = cv2.cvtColor(up, cv2.COLOR_BGR2GRAY)
+            _, binary = cv2.threshold(gray, 160, 255, cv2.THRESH_BINARY)
+            padded = cv2.copyMakeBorder(binary, 30, 30, 30, 30,
+                                        cv2.BORDER_CONSTANT, value=0)
+            inverted = cv2.bitwise_not(padded)
+            raw = pytesseract.image_to_string(
+                inverted, lang="jpn", config="--psm 7 --oem 3"
+            ).strip()
+            method_label = "tesseract"
 
-        raw = pytesseract.image_to_string(
-            inverted, lang="jpn", config="--psm 7 --oem 3"
-        ).strip()
-
+        # 日本語・英数字のみ抽出
         jp_only = "".join(re.findall(
             r"[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fff"
-            r"\u3000-\u303f！-～Ａ-Ｚａ-ｚ０-９]+",
+            r"\u3000-\u303f\uff01-\uff5e\uff66-\uff9fA-Za-z0-9]+",
             raw
         ))
 
-        # カード名DBでファジーマッチ補正
+        # カード名マスターでファジーマッチ補正
         if jp_only and self._all_card_names:
             corrected = deck_engine.fuzzy_correct(jp_only, self._all_card_names)
             if corrected:
                 jp_only = corrected
 
-        text = jp_only
-
         if DEBUG_OCR:
             self._save_debug(frame, ts or datetime.now().strftime("%H%M%S_%f"),
-                             method="ocr", result=text, raw=raw)
+                             method=method_label, result=jp_only, raw=raw)
 
-        return text or "(不明)"
+        return jp_only or "(不明)"
 
     # ── デバッグ保存 ──────────────────────────────
     def _save_debug(self, frame: np.ndarray, ts: str, method: str,
