@@ -384,45 +384,69 @@ class GameTracker:
                 self._emit("TURN_CHANGE", player=key, turn=self.turn_count)
                 break
 
-        # カード拡大表示の検知（差分トリガーを廃止し、直接テキストバナーの存在を監視）
-        has_text = self._has_card_text(frame)
-
-        if has_text and not self.card_visible:
-            self.card_visible = True
-            self.card_logged = False
-            self._card_appear_time = time.time()  # アニメーション安定待ちタイマー開始
-
-        if self.card_visible and not self.card_logged:
-            # テキストが継続して見えている間に0.5秒経過したら、安定したと見なしてOCR実行
-            if time.time() - getattr(self, '_card_appear_time', 0.0) > 0.5:
-                if has_text: # まだテキストが映っている場合のみ
-                    card_name = self._identify_card(frame)
-                    if card_name and card_name != "(不明)":
-                        player = self.current_player or "不明"
-                        self._emit("CARD_PLAYED", player=player, card=card_name, turn=self.turn_count)
-                        if player == "YOUR_TURN":
-                            self.my_cards.append(card_name)
-                        else:
-                            self.enemy_cards.append(card_name)
-                        # デッキ推定を更新
-                        if self.enemy_cards:
-                            deck, pct = deck_engine.infer(self.enemy_cards, self._decks)
-                            self._emit("DECK_INFERRED", deck=deck, pct=pct)
-                self.card_logged = True
-
-        # 長時間（安定して）テキストが見えなくなったらリセット
-        # 差分（motion）が少ない(=ピタッと止まっている)のにhas_textがFalseならカードは消えたと確信できる
+        # カード拡大表示の検知（状態遷移による安定フレーム待機）
+        # 画面の全体的な動きの大きさを計算
         card_region = rel_crop(frame, CARD_DETECT_REL)
         diff = frame_diff_score(self.prev_card_region, card_region) if self.prev_card_region is not None else 0
-        
-        if self.card_visible and not has_text:
-            if diff < CARD_HIDE_THRESHOLD:  # 静止しているのにテキストがない = カード閉じた
-                self.card_visible = False
-                self.card_logged = False
-                # 次の同じカードを認識できるようにハッシュ履歴を少し消す（簡略）
-                self._last_card_hash = None
-
         self.prev_card_region = card_region.copy()
+
+        anim_state = getattr(self, '_card_anim_state', 'idle')
+
+        if anim_state == 'idle':
+            if diff > CARD_DIFF_THRESHOLD:  # 大きな動きを検知（カードが出た、エフェクト等）
+                self._card_anim_state = 'animating'
+                self._motion_start_time = time.time()
+                
+        elif anim_state == 'animating':
+            if diff < 10.0:  # 動きがピタッと止まった！
+                self._card_anim_state = 'settled'
+                self._settled_time = time.time()
+                self.card_logged = False
+            elif time.time() - self._motion_start_time > 3.0:
+                # 3秒以上動き続けていればリセット
+                self._card_anim_state = 'idle'
+                
+        elif anim_state == 'settled':
+            if not self.card_logged:
+                # 念のため物理的に一瞬(0.2秒)だけ待つ
+                if time.time() - self._settled_time > 0.2:
+                    current_screen = capture_window(self._hwnd)
+                    
+                    # 不要な暗い画像の弾き（文字領域が真っ暗ならスキップ）
+                    # ダーク文明のカードでも文字は白なので多少の明るさはある
+                    if self._has_card_text(current_screen):
+                        card_name = self._identify_card(current_screen)
+                        if card_name and card_name != "(不明)":
+                            player = self.current_player or "不明"
+                            self._emit("CARD_PLAYED", player=player, card=card_name, turn=self.turn_count)
+                            if player == "YOUR_TURN":
+                                self.my_cards.append(card_name)
+                            else:
+                                self.enemy_cards.append(card_name)
+                                
+                            if self.enemy_cards:
+                                deck, pct = deck_engine.infer(self.enemy_cards, self._decks)
+                                self._emit("DECK_INFERRED", deck=deck, pct=pct)
+                            
+                            self._card_anim_state = 'displayed'
+                        else:
+                            # カード以外（エフェクト等）だった
+                            self._card_anim_state = 'idle'
+                    else:
+                        self._card_anim_state = 'idle'
+                        
+                    self.card_logged = True
+            else:
+                if diff > CARD_DIFF_THRESHOLD:
+                    self._card_anim_state = 'animating'
+                    self._motion_start_time = time.time()
+                    
+        elif anim_state == 'displayed':
+            # カードが表示中で静止している間。なにか動きがあれば閉じたとみなす
+            if diff > CARD_DIFF_THRESHOLD:
+                self._card_anim_state = 'animating'
+                self._motion_start_time = time.time()
+                self._last_card_hash = None  # 同じカードを再表示した際にも反応するようにリセット
 
     # ── バトルスタート検知 ───────────────────────
     def _detect_battle_start(self, frame: np.ndarray, w: int, h: int) -> bool:
