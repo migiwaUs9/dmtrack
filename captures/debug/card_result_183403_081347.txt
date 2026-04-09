@@ -1,0 +1,3 @@
+method: ocr
+result: ーーデー科アプー
+ocr_raw: ーー デー 科 ア プー

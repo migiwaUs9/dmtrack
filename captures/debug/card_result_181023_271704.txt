@@ -1,0 +1,3 @@
+method: ocr
+result: ーーンアイイ才レー
+ocr_raw: ーー ン ア イイ 2 才 レー

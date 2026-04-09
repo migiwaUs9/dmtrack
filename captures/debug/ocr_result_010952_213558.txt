@@ -1,0 +1,3 @@
+raw: ング ンー
+jp_only: ングンー
+final: ングンー

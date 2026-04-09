@@ -1,0 +1,3 @@
+method: ocr
+result: のタック
+ocr_raw: の 78 am タック

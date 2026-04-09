@@ -1,0 +1,3 @@
+method: ocr
+result: 元二導プリュウセ
+ocr_raw: | am% 元 二 導 プリ ュ ウ セ

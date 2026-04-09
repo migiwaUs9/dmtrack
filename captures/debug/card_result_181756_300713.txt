@@ -1,0 +1,3 @@
+method: ocr
+result: のイタキンーー
+ocr_raw: の イタ キン ーー

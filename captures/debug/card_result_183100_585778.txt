@@ -1,0 +1,3 @@
+method: ocr
+result: ーー
+ocr_raw: ーー 70 )

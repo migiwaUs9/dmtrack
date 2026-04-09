@@ -1,0 +1,3 @@
+method: ocr
+result: ーー意和全角
+ocr_raw: ーー- 意 和 全角

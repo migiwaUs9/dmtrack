@@ -1,0 +1,3 @@
+method: ocr
+result: 関証の、いいうした
+ocr_raw: 関 証 の 1、 いい 2 うし た

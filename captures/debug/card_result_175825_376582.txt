@@ -1,0 +1,3 @@
+method: ocr
+result: いい埋
+ocr_raw: 7/|1 1 いい 埋

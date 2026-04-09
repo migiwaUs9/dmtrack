@@ -1,0 +1,3 @@
+method: ocr
+result: 敵デー
+ocr_raw: , / 敵 デー

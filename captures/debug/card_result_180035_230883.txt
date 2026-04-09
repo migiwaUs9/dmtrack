@@ -1,0 +1,3 @@
+method: ocr
+result: ライガード・チャ
+ocr_raw: ライ ガー ド ・ チ ャ

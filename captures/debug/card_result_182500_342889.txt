@@ -1,0 +1,3 @@
+method: ocr
+result: るのし用用
+ocr_raw: る の し 用 用

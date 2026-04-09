@@ -1,0 +1,3 @@
+method: ocr
+result: 義補ーー
+ocr_raw: 22 義 補 ーー

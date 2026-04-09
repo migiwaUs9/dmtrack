@@ -1,0 +1,3 @@
+method: ocr
+result: タタ衝ゲー
+ocr_raw: タタ 衝 ゲー

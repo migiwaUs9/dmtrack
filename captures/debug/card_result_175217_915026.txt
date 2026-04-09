@@ -1,0 +1,3 @@
+method: ocr
+result: 半サンら
+ocr_raw: 半 サン ら

@@ -1,0 +1,3 @@
+method: ocr
+result: 較
+ocr_raw: 較

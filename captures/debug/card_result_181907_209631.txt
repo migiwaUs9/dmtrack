@@ -1,0 +1,3 @@
+method: ocr
+result: 凶をオイーー
+ocr_raw: 凶 VY を オイ ーー

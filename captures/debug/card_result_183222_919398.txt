@@ -1,0 +1,3 @@
+method: ocr
+result: ーー兆ー
+ocr_raw: ーー 兆 "ー

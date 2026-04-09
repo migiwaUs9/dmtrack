@@ -1,0 +1,3 @@
+method: ocr
+result: が人ネンてーー
+ocr_raw: / が 人 ネン て ーー

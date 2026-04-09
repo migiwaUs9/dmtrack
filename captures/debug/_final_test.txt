@@ -1,0 +1,4 @@
+Raw OCR: 画 間 症 朱 来 訳 計 図
+JP only: 画間症朱来訳計図
+Corrected: None
+Expected: 未来設計図

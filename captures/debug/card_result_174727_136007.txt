@@ -1,0 +1,3 @@
+method: ocr
+result: ーー電用朋了チー
+ocr_raw: ーー- 電 用 朋 了 チー

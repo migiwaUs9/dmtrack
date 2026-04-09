@@ -1,0 +1,3 @@
+method: ocr
+result: アン閉デーー
+ocr_raw: アン 閉 デ ーー

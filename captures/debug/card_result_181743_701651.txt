@@ -1,0 +1,3 @@
+method: ocr
+result: ク
+ocr_raw: | FT]52ss2 ク 2

@@ -1,0 +1,3 @@
+method: ocr
+result: ングが位導ーー
+ocr_raw: . ング が 位 導 ーー

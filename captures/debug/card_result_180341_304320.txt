@@ -1,0 +1,3 @@
+method: ocr
+result: レヘへノキ開ンー
+ocr_raw: レ ヘ へ ノ . キ 開 ンー

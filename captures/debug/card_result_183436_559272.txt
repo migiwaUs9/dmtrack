@@ -1,0 +1,3 @@
+method: ocr
+result: ーー壮一
+ocr_raw: ーー 壮一

@@ -1,0 +1,3 @@
+method: ocr
+result: 四マン
+ocr_raw: 四 c/ マン

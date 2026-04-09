@@ -1,0 +1,3 @@
+method: ocr
+result: 遇所豆だ
+ocr_raw: 遇 所 豆 だ 44

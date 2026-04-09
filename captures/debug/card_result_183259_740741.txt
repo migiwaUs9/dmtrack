@@ -1,0 +1,3 @@
+method: ocr
+result: 時ンプーー介了ンー
+ocr_raw: 時 ンプ ーー 介 了 ンー

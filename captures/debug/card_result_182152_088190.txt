@@ -1,0 +1,3 @@
+method: ocr
+result: とこジジ
+ocr_raw: | 1 とこ 5 ジジ

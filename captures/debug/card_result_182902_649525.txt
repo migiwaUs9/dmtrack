@@ -1,0 +1,3 @@
+method: ocr
+result: 病補ー
+ocr_raw: 2 病 補 ー

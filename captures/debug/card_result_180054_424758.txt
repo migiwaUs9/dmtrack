@@ -1,0 +1,3 @@
+method: ocr
+result: 症商革能デン
+ocr_raw: 症 商 革 能 デン

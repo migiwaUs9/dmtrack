@@ -1,0 +1,3 @@
+method: ocr
+result: 「ノ開ーーンン才
+ocr_raw: . 「 ノ . N 開 ーー ン ン 才

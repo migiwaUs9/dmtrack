@@ -1,0 +1,3 @@
+method: ocr
+result: がリリイベーー
+ocr_raw: が リリ イベ ーー

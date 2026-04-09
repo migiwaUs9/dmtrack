@@ -1,0 +1,3 @@
+method: ocr
+result: 、還誰
+ocr_raw: 、- 還 誰

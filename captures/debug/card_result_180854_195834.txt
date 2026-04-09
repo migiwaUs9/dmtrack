@@ -1,0 +1,3 @@
+method: ocr
+result: ンアア潤刻デニー
+ocr_raw: _ ン アア 潤 刻 デ ニー

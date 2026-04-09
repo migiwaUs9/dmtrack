@@ -1,0 +1,3 @@
+raw: Ra き x4 枯 有 ま WT
+jp_only: き枯有ま
+final: き枯有ま

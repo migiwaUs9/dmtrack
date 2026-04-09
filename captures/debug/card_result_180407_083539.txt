@@ -1,0 +1,3 @@
+method: ocr
+result: 疾人全
+ocr_raw: 疾 人 全

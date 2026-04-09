@@ -1,0 +1,3 @@
+method: ocr
+result: 「へ電
+ocr_raw: 「 へ NN 電

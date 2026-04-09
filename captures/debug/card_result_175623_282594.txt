@@ -1,0 +1,3 @@
+method: ocr
+result: 語族中ライカーーテャーー
+ocr_raw: 語族 [中 ライカ ーー テ ャ ーー

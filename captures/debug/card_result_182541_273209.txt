@@ -1,0 +1,3 @@
+method: ocr
+result: 龍装盤チェンシ
+ocr_raw: _ 龍 装 盤 チェ ン シ

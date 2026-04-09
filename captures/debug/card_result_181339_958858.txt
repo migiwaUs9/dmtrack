@@ -1,0 +1,3 @@
+method: ocr
+result: 攻をーー
+ocr_raw: 攻 YY を ーー

@@ -1,0 +1,3 @@
+method: ocr
+result: 敵
+ocr_raw: 2 敵

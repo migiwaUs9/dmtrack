@@ -1,0 +1,3 @@
+method: ocr
+result: 際をイー
+ocr_raw: _ 際 \ を イー

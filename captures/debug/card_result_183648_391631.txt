@@ -1,0 +1,3 @@
+method: ocr
+result: て芝デーンー
+ocr_raw: - 2 = て AN 芝 デー ンー

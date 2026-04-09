@@ -1,0 +1,3 @@
+method: ocr
+result: ビへ夫
+ocr_raw: ビ へ 夫

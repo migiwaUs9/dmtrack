@@ -1,0 +1,3 @@
+method: ocr
+result: ドラゴンズ・サイン
+ocr_raw: (5 ドラ ゴン ズ ・ サ イン

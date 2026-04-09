@@ -1,0 +1,3 @@
+method: ocr
+result: 部
+ocr_raw: _ 部

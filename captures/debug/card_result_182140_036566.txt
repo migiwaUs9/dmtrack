@@ -1,0 +1,3 @@
+method: hash
+result: 科導ーー
+hash: 97c2e78066084a077917780fe02ff6fc6158812993bf31ffb2ff1ffc0dc88028

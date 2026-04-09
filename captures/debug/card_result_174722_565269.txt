@@ -1,0 +1,3 @@
+method: ocr
+result: 一吉必衣デアー
+ocr_raw: 一 吉 必 衣 デ アー

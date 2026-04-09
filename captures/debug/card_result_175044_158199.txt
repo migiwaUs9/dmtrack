@@ -1,0 +1,3 @@
+method: ocr
+result: ーーン昌生放アーー
+ocr_raw: ーー ン 昌 生 放 ア ーー

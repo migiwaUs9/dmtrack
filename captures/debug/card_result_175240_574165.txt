@@ -1,0 +1,3 @@
+method: ocr
+result: 層ルの
+ocr_raw: 層  3 ル の

@@ -1,0 +1,3 @@
+method: ocr
+result: ーーププ
+ocr_raw: ーー ププ

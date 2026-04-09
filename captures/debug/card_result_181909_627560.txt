@@ -1,0 +1,3 @@
+method: ocr
+result: のの本
+ocr_raw: ( の の 本 2

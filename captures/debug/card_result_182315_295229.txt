@@ -1,0 +1,3 @@
+method: ocr
+result: ンタ導レー
+ocr_raw: ンタ 導 レー

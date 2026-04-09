@@ -1,0 +1,3 @@
+method: ocr
+result: 琴、
+ocr_raw: 琴 、

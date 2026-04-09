@@ -1,0 +1,3 @@
+method: ocr
+result: エメラル
+ocr_raw: ミア フー ニー ファ ラル ャ 有 .

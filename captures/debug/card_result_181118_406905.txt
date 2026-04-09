@@ -1,0 +1,3 @@
+method: ocr
+result: ーー一
+ocr_raw: ーー 一 ano

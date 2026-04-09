@@ -1,0 +1,3 @@
+method: ocr
+result: 間
+ocr_raw: 間

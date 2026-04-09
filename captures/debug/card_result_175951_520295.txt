@@ -1,0 +1,3 @@
+method: ocr
+result: 析吉語導っ
+ocr_raw: 1 7 析 吉 語 導 っ

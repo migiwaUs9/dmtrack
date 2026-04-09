@@ -1,0 +1,8 @@
+enhanced psm=6: 'ッッ アア\n! リ 用 志 品 志木 玉 設 計 図 陸'
+enhanced psm=7: '5 | 、 、 と 所 科 月 加 し'
+binary psm=6: '【 対 ネ 来 設計 凶 げ'
+binary psm=7: 'B | 、 と 和 月'
+closed psm=6: '【 対 ネ 来 設計 凶 げ'
+closed psm=7: 'B 4 、 と で 月 1'
+inverted_padded psm=6: 'ます 。、 も 把持 騰 身 /'
+inverted_padded psm=7: '1 、6 拉 用 由 /'

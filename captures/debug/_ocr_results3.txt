@@ -1,0 +1,8 @@
+psm=6 binary: '| 還 計 玉 来 設計 回'
+psm=6 invert: '| 還 計 玉 来 設計 回'
+psm=7 binary: '| 還 計 玉 来 設計 回'
+psm=7 invert: '| 還 計 玉 来 設計 回'
+psm=8 binary: '| 5 昌和'
+psm=8 invert: '| 5 昌和'
+psm=13 binary: '| 5 昌和'
+psm=13 invert: '| 5 昌和'

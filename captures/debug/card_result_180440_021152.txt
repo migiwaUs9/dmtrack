@@ -1,0 +1,3 @@
+method: ocr
+result: 「ンプレイ
+ocr_raw: 「 [ンプ レイ

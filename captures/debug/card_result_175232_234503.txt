@@ -1,0 +1,3 @@
+method: ocr
+result: すすいさ
+ocr_raw: すす / 11 いさ

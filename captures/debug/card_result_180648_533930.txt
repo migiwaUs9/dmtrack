@@ -1,0 +1,3 @@
+method: ocr
+result: 還全仏間
+ocr_raw: 還 全 仏間

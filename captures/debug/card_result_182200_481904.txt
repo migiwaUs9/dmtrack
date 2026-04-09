@@ -1,0 +1,3 @@
+method: ocr
+result: ンン敵アンー
+ocr_raw: ン ン 敵 ア ンー

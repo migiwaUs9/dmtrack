@@ -1,0 +1,3 @@
+method: ocr
+result: 用さるイオニン
+ocr_raw: . 用 さる イオ ニン

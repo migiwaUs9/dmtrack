@@ -1,0 +1,3 @@
+method: ocr
+result: スー
+ocr_raw: スー

@@ -1,0 +1,3 @@
+method: ocr
+result: ーー計生ンー
+ocr_raw: ーー 計 生 ンー

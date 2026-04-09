@@ -1,0 +1,3 @@
+method: ocr
+result: ーーデビと
+ocr_raw: ーー デビ Mg と

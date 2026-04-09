@@ -1,0 +1,3 @@
+method: ocr
+result: ピートクコッイー
+ocr_raw: ピー トク コッ イー

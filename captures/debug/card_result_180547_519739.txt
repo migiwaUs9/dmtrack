@@ -1,0 +1,3 @@
+method: ocr
+result: キッーー
+ocr_raw: キッ ーー

@@ -1,0 +1,3 @@
+method: ocr
+result: メ肌
+ocr_raw: : メ 肌 | ViV

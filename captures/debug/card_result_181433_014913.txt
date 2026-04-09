@@ -1,0 +1,3 @@
+method: ocr
+result: のセタイー
+ocr_raw: の セタ イー

@@ -1,0 +1,3 @@
+method: ocr
+result: ーーーー一生生放電諸語
+ocr_raw: ーー ーー 一 生生 放電 諸語

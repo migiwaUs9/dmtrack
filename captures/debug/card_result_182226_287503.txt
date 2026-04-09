@@ -1,0 +1,3 @@
+method: ocr
+result: て聞こし
+ocr_raw: て 聞こ し

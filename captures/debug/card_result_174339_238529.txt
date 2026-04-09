@@ -1,0 +1,3 @@
+method: ocr
+result: ング人生本ンー
+ocr_raw: ング 人生 本 ンー

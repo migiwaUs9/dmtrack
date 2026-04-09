@@ -1,0 +1,3 @@
+method: ocr
+result: 
+ocr_raw: so

@@ -1,0 +1,3 @@
+method: ocr
+result: ングブ導
+ocr_raw: ング ブ 導 5

@@ -1,0 +1,3 @@
+method: ocr
+result: のタタヤー
+ocr_raw: の タタ ヤー

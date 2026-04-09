@@ -1,0 +1,3 @@
+method: ocr
+result: 。ャ瑞語ンー
+ocr_raw: 。 | | ャ 瑞 語 ンー

@@ -1,0 +1,3 @@
+method: ocr
+result: でるッ員ンイ
+ocr_raw: " (で る ッ 員 ン イ

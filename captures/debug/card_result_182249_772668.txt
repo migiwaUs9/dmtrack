@@ -1,0 +1,3 @@
+method: ocr
+result: すすいい
+ocr_raw: すす / 1 いい

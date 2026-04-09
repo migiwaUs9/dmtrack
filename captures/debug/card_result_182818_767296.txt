@@ -1,0 +1,3 @@
+method: ocr
+result: アア壮デー
+ocr_raw: アア 壮 デー

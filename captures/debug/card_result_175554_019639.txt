@@ -1,0 +1,3 @@
+method: ocr
+result: へ了ノーい「昌ンー
+ocr_raw: へ 了 ノー い 「 昌 ンー

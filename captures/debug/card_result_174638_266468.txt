@@ -1,0 +1,3 @@
+method: ocr
+result: ンコるがを
+ocr_raw: ンコ る So が 85 を

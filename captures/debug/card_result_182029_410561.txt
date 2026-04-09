@@ -1,0 +1,3 @@
+method: ocr
+result: フェアリー・ライフ
+ocr_raw: | フェ アリ ー・ ヨ |

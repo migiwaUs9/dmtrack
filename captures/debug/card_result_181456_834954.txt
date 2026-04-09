@@ -1,0 +1,3 @@
+method: ocr
+result: とローキンクタ本
+ocr_raw: と ロー キン クタ 2 本

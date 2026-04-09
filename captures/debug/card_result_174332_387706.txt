@@ -1,0 +1,3 @@
+method: ocr
+result: ドー
+ocr_raw: ドー 4

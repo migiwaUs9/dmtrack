@@ -1,0 +1,3 @@
+method: ocr
+result: ーー敵半る
+ocr_raw: ll 7 ーー < 敵 半 る

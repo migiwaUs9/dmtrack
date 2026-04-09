@@ -1,0 +1,3 @@
+method: ocr
+result: 池『をーー
+ocr_raw: 池 『 を ーー

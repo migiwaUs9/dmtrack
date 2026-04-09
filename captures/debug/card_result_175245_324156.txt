@@ -1,0 +1,3 @@
+method: ocr
+result: が衝ーー
+ocr_raw: が 衝 ーー

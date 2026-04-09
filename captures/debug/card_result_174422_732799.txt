@@ -1,0 +1,3 @@
+method: ocr
+result: ング議了ー
+ocr_raw: ング 議 了 ー

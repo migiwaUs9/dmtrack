@@ -1,0 +1,3 @@
+method: ocr
+result: 下石己必功
+ocr_raw: 下 石 己 必 功 !

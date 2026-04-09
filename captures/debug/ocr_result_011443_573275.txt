@@ -1,0 +1,3 @@
+raw: ルン 有
+jp_only: ルン有
+final: ルン有

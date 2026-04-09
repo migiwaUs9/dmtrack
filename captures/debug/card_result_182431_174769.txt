@@ -1,0 +1,3 @@
+method: ocr
+result: アア導デー
+ocr_raw: アア 導 デー

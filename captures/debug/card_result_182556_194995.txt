@@ -1,0 +1,3 @@
+method: hash
+result: 科ーー
+hash: c74bd552359662ad64ad7805e24eadbd4158425962ddb5be92f69dbc9da2a009

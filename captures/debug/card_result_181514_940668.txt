@@ -1,0 +1,3 @@
+method: ocr
+result: フー誕
+ocr_raw: 1 フー mamvw 誕 |

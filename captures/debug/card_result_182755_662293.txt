@@ -1,0 +1,3 @@
+method: ocr
+result: 導
+ocr_raw: 導

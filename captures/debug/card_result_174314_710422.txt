@@ -1,0 +1,3 @@
+method: ocr
+result: ング凍ーー
+ocr_raw: ング 凍 ーー

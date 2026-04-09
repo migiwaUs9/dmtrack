@@ -1,0 +1,3 @@
+method: hash
+result: 敵
+hash: c54ad5421604eab77a0f700d682fea7d5048c538637db1ff92f797cc9ac8e824

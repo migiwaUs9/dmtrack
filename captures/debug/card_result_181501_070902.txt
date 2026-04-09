@@ -1,0 +1,3 @@
+method: ocr
+result: 用装いリリ
+ocr_raw: 用 装い リリ

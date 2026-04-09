@@ -1,0 +1,3 @@
+method: ocr
+result: 才ケー
+ocr_raw: 7 才 ケー

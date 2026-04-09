@@ -1,0 +1,3 @@
+method: ocr
+result: ーー閉しー
+ocr_raw: ーー 閉 し ー

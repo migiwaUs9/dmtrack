@@ -1,0 +1,3 @@
+method: ocr
+result: 回人の公記癌
+ocr_raw: 回 人 の 公記 癌 2

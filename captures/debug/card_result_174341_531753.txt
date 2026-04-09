@@ -1,0 +1,3 @@
+method: ocr
+result: ググの由
+ocr_raw: ググ の 由

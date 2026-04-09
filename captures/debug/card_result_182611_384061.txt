@@ -1,0 +1,3 @@
+method: ocr
+result: のンコラン
+ocr_raw: の ンコ ラン

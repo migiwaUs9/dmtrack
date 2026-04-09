@@ -1,0 +1,3 @@
+method: ocr
+result: いいキー
+ocr_raw: いい キー

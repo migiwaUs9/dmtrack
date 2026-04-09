@@ -1,0 +1,3 @@
+method: ocr
+result: ーーング幼
+ocr_raw: ーー ング 幼

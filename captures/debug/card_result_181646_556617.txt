@@ -1,0 +1,3 @@
+method: ocr
+result: 邊てをオープ
+ocr_raw: 邊 て を オープ

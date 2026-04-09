@@ -1,0 +1,3 @@
+method: ocr
+result: 「、とャココクリ
+ocr_raw: |「 、 と ャ ココ クリ

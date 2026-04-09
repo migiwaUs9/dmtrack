@@ -1,0 +1,3 @@
+method: ocr
+result: 本
+ocr_raw: 本

@@ -1,0 +1,3 @@
+method: ocr
+result: ンプ時雨ビー
+ocr_raw: . ンプ 時雨 ビー

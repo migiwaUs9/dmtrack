@@ -1,0 +1,3 @@
+method: ocr
+result: ンータテ人六際ーー
+ocr_raw: - ンー タテ 人 六 際 ーー

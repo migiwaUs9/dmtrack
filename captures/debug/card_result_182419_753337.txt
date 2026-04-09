@@ -1,0 +1,3 @@
+method: ocr
+result: ーーシコューここ、がたを
+ocr_raw: ーー シコ: ュー ここ 、 が た を 7

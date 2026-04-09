@@ -1,0 +1,3 @@
+method: ocr
+result: ンー科ー
+ocr_raw: ンー 科 ー

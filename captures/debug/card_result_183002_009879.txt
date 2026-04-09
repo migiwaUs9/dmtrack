@@ -1,0 +1,3 @@
+method: ocr
+result: パパテ
+ocr_raw: _ パパ テ

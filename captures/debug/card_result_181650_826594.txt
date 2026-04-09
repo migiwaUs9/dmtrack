@@ -1,0 +1,3 @@
+method: ocr
+result: ペギング人失・オウ敵民
+ocr_raw: ペ | - ギ ング 人 失 ・ オウ 敵 民

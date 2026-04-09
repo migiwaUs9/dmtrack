@@ -1,0 +1,3 @@
+method: ocr
+result: きき・柳
+ocr_raw: きき r・ 柳

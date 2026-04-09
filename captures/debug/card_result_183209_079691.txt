@@ -1,0 +1,3 @@
+method: ocr
+result: へ育壮欠〒ェ次
+ocr_raw: へ 育 壮 欠 〒 ェ 次

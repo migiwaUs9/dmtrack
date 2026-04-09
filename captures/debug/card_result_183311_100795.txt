@@ -1,0 +1,3 @@
+method: ocr
+result: 考条天詳昌っ
+ocr_raw: 5 7 考 条 天 詳 昌 0 っ

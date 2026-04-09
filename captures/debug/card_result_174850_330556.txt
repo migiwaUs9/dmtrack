@@ -1,0 +1,3 @@
+method: ocr
+result: 証人のの
+ocr_raw: 証人 の の

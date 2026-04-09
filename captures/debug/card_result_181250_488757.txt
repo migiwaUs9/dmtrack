@@ -1,0 +1,3 @@
+method: ocr
+result: えるイオニン
+ocr_raw: える イオ ニン

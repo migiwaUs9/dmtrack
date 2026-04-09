@@ -1,0 +1,3 @@
+method: ocr
+result: 韻症石与ジゼ切
+ocr_raw: 韻 症 石 与 ジ ゼ 切 |

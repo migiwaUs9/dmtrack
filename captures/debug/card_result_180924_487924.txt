@@ -1,0 +1,3 @@
+method: ocr
+result: のとの上休
+ocr_raw: の と の) 上 休

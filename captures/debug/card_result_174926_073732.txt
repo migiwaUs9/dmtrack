@@ -1,0 +1,3 @@
+method: ocr
+result: も
+ocr_raw: も

@@ -1,0 +1,3 @@
+method: ocr
+result: ンーーーンフ代アニン
+ocr_raw: ンー ーー ン フ NM 代 ア ニン

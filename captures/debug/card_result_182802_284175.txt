@@ -1,0 +1,3 @@
+method: ocr
+result: イイドー導の
+ocr_raw: イイ ドー, 導 の

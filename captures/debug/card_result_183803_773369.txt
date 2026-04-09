@@ -1,0 +1,3 @@
+method: ocr
+result: ーーご小ー
+ocr_raw: ーー ご 小 "ー

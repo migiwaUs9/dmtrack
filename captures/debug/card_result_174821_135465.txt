@@ -1,0 +1,3 @@
+method: ocr
+result: ーー才寺月チー
+ocr_raw: ーー 才 寺 月 チー

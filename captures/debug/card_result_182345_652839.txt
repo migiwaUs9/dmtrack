@@ -1,0 +1,3 @@
+method: ocr
+result: アン拉デデニー
+ocr_raw: アン 2 拉 デ デニー

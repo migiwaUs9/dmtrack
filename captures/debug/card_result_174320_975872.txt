@@ -1,0 +1,3 @@
+method: ocr
+result: 利のリコビン衣
+ocr_raw: 利 の リコ ビン 衣

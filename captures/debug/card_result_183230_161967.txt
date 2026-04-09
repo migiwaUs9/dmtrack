@@ -1,0 +1,3 @@
+method: ocr
+result: 時ビンーとア・ゝアンー
+ocr_raw: 時 ビ ンー と ア ・ ゝ ア ンー

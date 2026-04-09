@@ -1,0 +1,3 @@
+method: ocr
+result: ンーデー兆しー
+ocr_raw: - ンー デー 兆し ー

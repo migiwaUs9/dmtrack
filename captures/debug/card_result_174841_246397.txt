@@ -1,0 +1,3 @@
+method: ocr
+result: ーー間生本アーー
+ocr_raw: ーー 間 生 本 ア ーー

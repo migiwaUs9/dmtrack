@@ -1,0 +1,3 @@
+raw: 2 時
+jp_only: 時
+final: 時

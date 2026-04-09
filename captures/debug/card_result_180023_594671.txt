@@ -1,0 +1,3 @@
+method: ocr
+result: 癌人公ン
+ocr_raw: 癌 人 公 P ン

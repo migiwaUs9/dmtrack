@@ -1,0 +1,3 @@
+method: ocr
+result: ・龍装騰チェジ
+ocr_raw: ・ 龍 装 騰 | チェ ジ :

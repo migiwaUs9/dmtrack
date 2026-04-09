@@ -1,0 +1,3 @@
+method: ocr
+result: フー負
+ocr_raw: 1 フー mmmvv 負 |

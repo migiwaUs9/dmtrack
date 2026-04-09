@@ -1,0 +1,3 @@
+method: ocr
+result: 龍革者刻導
+ocr_raw: 龍 革 者 刻 導 2

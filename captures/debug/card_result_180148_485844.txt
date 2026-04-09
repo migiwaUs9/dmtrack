@@ -1,0 +1,3 @@
+method: ocr
+result: ライカード・チャ
+ocr_raw: ライ カー ド ・ チ ャ

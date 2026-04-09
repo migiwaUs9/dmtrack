@@ -1,0 +1,3 @@
+method: ocr
+result: リンーー
+ocr_raw: リン 29 ーー

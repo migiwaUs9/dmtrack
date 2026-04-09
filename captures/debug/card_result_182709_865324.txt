@@ -1,0 +1,3 @@
+method: ocr
+result: アア議宮ケリレー
+ocr_raw: アア 議 宮 ケリ レー

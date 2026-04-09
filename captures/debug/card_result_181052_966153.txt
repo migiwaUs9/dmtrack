@@ -1,0 +1,3 @@
+method: ocr
+result: ーン補ンー
+ocr_raw: ー ン 7 補 ンー

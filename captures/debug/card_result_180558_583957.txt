@@ -1,0 +1,3 @@
+method: ocr
+result: 回全公広誠
+ocr_raw: 回 全 公 広 誠 2

@@ -1,0 +1,3 @@
+raw: 生 の 2 証
+jp_only: 生の証
+final: 生の証

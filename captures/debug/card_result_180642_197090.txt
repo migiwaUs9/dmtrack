@@ -1,0 +1,3 @@
+method: ocr
+result: 由寺。ー
+ocr_raw: 由 2. 寺 。 ー

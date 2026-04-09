@@ -1,0 +1,3 @@
+method: ocr
+result: 画画還間間
+ocr_raw: 画 画 還 間 間

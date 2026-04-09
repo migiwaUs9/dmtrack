@@ -1,0 +1,3 @@
+method: ocr
+result: メンデルスゾーン
+ocr_raw: ンタ デーン

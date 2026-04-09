@@ -1,0 +1,3 @@
+method: ocr
+result: ーービンンー
+ocr_raw: ーー ビン ンー

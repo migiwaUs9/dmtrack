@@ -1,0 +1,3 @@
+method: hash
+result: ンーデー兆しー
+hash: d748e7692516f426272925b5664965a9f7b86a566b459538195bdab981b214db

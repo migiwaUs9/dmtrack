@@ -1,0 +1,3 @@
+method: ocr
+result: 一号生一
+ocr_raw: 一 号 生 一

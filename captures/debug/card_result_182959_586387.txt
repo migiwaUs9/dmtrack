@@ -1,0 +1,3 @@
+method: ocr
+result: へ龍美懇チェンシ
+ocr_raw: へ 龍 美 懇 チェ ン シ

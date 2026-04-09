@@ -1,0 +1,3 @@
+method: ocr
+result: 水晶の祈り
+ocr_raw: の 2

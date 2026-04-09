@@ -1,0 +1,3 @@
+method: ocr
+result: ンーン衝本計了ーー
+ocr_raw: ンー ン 衝 本 計 了 ーー

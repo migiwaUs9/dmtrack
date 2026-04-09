@@ -1,0 +1,3 @@
+method: ocr
+result: ヴォルグ・サンダー
+ocr_raw: グン ダバ ーー

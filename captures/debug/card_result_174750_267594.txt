@@ -1,0 +1,3 @@
+method: ocr
+result: ーー稀和テテ
+ocr_raw: ーー 稀 和 テテ

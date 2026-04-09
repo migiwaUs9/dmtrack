@@ -1,0 +1,3 @@
+method: ocr
+result: コバパート・デ・ル
+ocr_raw: コバ パート ・ デ ・ ル

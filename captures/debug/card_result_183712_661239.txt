@@ -1,0 +1,3 @@
+method: ocr
+result: 人ム煙熊サカッヴアデ
+ocr_raw: 人 ム 煙 熊 >: サ カッ ヴ アデ =

@@ -1,0 +1,3 @@
+method: ocr
+result: のタントー
+ocr_raw: の タン トー

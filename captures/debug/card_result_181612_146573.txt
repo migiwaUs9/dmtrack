@@ -1,0 +1,3 @@
+method: ocr
+result: 務ィーー
+ocr_raw: 務 Y ィ ーー

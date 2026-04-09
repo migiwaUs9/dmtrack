@@ -1,0 +1,3 @@
+method: ocr
+result: メタリカ
+ocr_raw: メタ リカ

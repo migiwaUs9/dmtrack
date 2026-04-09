@@ -1,0 +1,3 @@
+method: ocr
+result: ーーン議刻リー
+ocr_raw: ーー ン / 議 刻 リ ー

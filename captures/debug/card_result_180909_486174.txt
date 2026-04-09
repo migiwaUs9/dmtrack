@@ -1,0 +1,3 @@
+method: ocr
+result: のン科電ア時デー
+ocr_raw: の ン / 科 電 ア 時 7 デー

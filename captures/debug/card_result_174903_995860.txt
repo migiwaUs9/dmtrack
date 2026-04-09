@@ -1,0 +1,3 @@
+method: ocr
+result: ーーミ攻ンー
+ocr_raw: _ ーー ミ 攻 ンー

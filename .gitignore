@@ -1,0 +1,9 @@
+﻿captures/*.mp4
+captures/frames/
+__pycache__/
+*.traineddata
+jpn.traineddata
+logs/*.csv
+.gemini/
+.vscode/
+*.lock

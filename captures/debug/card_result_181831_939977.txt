@@ -1,0 +1,3 @@
+method: ocr
+result: ロキンクオウ紀
+ocr_raw: ロキ ンク オウ 紀 4

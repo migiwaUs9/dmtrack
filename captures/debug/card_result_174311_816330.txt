@@ -1,0 +1,3 @@
+method: ocr
+result: ング半ー
+ocr_raw: ング 半 R_ー

@@ -1,0 +1,3 @@
+method: ocr
+result: ーーンイデイン
+ocr_raw: ーー ン イ 400 デ イン

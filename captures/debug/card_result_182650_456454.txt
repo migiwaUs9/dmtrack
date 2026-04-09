@@ -1,0 +1,3 @@
+method: ocr
+result: 『「癌石ミダクセ
+ocr_raw: 『「 癌 石 ミダ クセ)

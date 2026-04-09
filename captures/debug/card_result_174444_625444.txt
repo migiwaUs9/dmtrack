@@ -1,0 +1,3 @@
+method: ocr
+result: ーーングイプ
+ocr_raw: ーー ング イプ

@@ -1,0 +1,3 @@
+method: ocr
+result: がにをて
+ocr_raw: が に を て

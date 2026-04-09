@@ -1,0 +1,3 @@
+method: ocr
+result: へ煙能功衝補
+ocr_raw: へ 煙 能 功 衝 補

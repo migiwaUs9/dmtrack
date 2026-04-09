@@ -1,0 +1,3 @@
+method: ocr
+result: 交ンー
+ocr_raw: 2 交 ンー

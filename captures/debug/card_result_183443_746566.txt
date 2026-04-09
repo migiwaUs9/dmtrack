@@ -1,0 +1,3 @@
+method: ocr
+result: の間し
+ocr_raw: の 0 間 し 0

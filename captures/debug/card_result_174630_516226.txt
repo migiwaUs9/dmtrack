@@ -1,0 +1,3 @@
+method: ocr
+result: 生生用テー
+ocr_raw: 生生 用 テー

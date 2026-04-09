@@ -1,0 +1,3 @@
+method: ocr
+result: ーー乾因月チー
+ocr_raw: ーー 乾 因 月 チー

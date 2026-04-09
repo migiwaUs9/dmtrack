@@ -1,0 +1,3 @@
+method: ocr
+result: ーー電肘朋チーー
+ocr_raw: ーー- 電 肘 朋 チ ーー

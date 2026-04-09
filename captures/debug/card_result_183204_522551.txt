@@ -1,0 +1,3 @@
+method: ocr
+result: 虹ングゝ基めンー
+ocr_raw: 虹 ング ゝ 基 め ンー

@@ -1,0 +1,3 @@
+method: ocr
+result: ーー衝・も較ウルクン
+ocr_raw: ーー 衝 ・ も 較 ウルク ン

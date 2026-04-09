@@ -1,0 +1,3 @@
+method: ocr
+result: ーーる和國上則と
+ocr_raw: ーー る 和 國 上 則 と

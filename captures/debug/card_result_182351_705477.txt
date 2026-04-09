@@ -1,0 +1,3 @@
+method: ocr
+result: ドンドン吹雪く
+ocr_raw: ドン ドン 吹 雪 く

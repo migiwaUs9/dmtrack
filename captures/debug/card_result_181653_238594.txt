@@ -1,0 +1,3 @@
+method: ocr
+result: がをンー
+ocr_raw: / が を ンー

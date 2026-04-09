@@ -1,0 +1,3 @@
+method: ocr
+result: ・本・ーートワク々〔人
+ocr_raw: ・ * + 本 ・ t ーー ト : [ワク 々 1〔 1 人

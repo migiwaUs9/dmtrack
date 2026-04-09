@@ -1,0 +1,3 @@
+method: ocr
+result: 衣人をーー
+ocr_raw: / 衣 人 を ーー

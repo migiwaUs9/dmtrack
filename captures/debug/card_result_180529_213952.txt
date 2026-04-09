@@ -1,0 +1,3 @@
+method: ocr
+result: 問語各作の中
+ocr_raw: 問 語 各 作 の 中

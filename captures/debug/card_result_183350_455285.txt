@@ -1,0 +1,3 @@
+method: ocr
+result: ーーンジンイ
+ocr_raw: ーー ンジ ン イ 3

@@ -1,0 +1,3 @@
+method: ocr
+result: 名
+ocr_raw: ll 12 mmmvivy 名 |

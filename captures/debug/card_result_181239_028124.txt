@@ -1,0 +1,3 @@
+method: ocr
+result: 了イオンーー
+ocr_raw: 了 \ イ オン ーー

@@ -1,0 +1,3 @@
+method: ocr
+result: ーー際いいンー
+ocr_raw: . 7 ーー / 際 M いい ンー

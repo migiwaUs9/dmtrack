@@ -1,0 +1,3 @@
+method: ocr
+result: イイ才放デーー
+ocr_raw: 5 イイ / 才 放 デ ーー

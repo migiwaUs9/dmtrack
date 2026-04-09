@@ -1,0 +1,3 @@
+method: ocr
+result: れれビビをペレレン
+ocr_raw: れれ ビビ を ペレ レン

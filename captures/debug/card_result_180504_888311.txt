@@ -1,0 +1,3 @@
+method: ocr
+result: へ煙龍編ツヴアミ
+ocr_raw: へ 煙 龍 編 ツ ヴ アミ:

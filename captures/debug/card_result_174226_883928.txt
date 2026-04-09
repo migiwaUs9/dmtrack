@@ -1,0 +1,3 @@
+method: ocr
+result: ング絆一
+ocr_raw: ング 絆 一

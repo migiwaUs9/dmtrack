@@ -1,0 +1,3 @@
+method: ocr
+result: デー需
+ocr_raw: < デー 需

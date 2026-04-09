@@ -1,0 +1,3 @@
+method: ocr
+result: 出ジーンンアイ
+ocr_raw: 7 出 V ジー ン ン アイ

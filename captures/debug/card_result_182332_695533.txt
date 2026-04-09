@@ -1,0 +1,3 @@
+method: hash
+result: すすいさ
+hash: da7c3fd4ac40644312bf70b7c585cb6a1ab269d59344cb39dd2079b2bd82be12

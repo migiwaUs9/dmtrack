@@ -1,0 +1,3 @@
+method: ocr
+result: び二生月デー
+ocr_raw: び 二 生 月 デー

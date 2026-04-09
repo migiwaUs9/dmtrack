@@ -1,0 +1,3 @@
+method: ocr
+result: 必タダ
+ocr_raw: 152ss 必 タダ

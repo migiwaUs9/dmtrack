@@ -1,0 +1,3 @@
+method: ocr
+result: へ灯龍ザック
+ocr_raw: へ 灯 龍 ! ザ ッ ク

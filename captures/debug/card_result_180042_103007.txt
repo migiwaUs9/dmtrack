@@ -1,0 +1,3 @@
+method: ocr
+result: キージジクジ
+ocr_raw: キー ジジ クジ

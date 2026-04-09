@@ -1,0 +1,3 @@
+method: ocr
+result: マジック・ソング
+ocr_raw: クノ ング 、.

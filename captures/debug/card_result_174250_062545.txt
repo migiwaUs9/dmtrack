@@ -1,0 +1,3 @@
+method: ocr
+result: モモキングRX
+ocr_raw: ング 症

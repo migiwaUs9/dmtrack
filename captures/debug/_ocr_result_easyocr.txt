@@ -1,0 +1,5 @@
+conf=0.000 text='象ハリ'
+--- gray ---
+conf=0.001 text='昂衆郎図'
+--- color ---
+conf=0.000 text='塚衆闘郎国'

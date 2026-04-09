@@ -1,0 +1,3 @@
+method: ocr
+result: 入団の光魂
+ocr_raw: RE 入団 の 光 魂 G

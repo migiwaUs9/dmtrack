@@ -1,0 +1,3 @@
+method: ocr
+result: 規竹還ー
+ocr_raw: 規 \ 竹 還 ー

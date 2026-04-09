@@ -1,0 +1,3 @@
+method: ocr
+result: 人煙龍品なメッウヴア
+ocr_raw: 人 煙 龍 品 な メッ ウ ヴ ア =

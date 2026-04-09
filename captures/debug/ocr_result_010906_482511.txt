@@ -1,0 +1,3 @@
+raw: クイ ルー
+jp_only: クイルー
+final: クイルー

@@ -1,0 +1,3 @@
+method: ocr
+result: アア敵家ケリレー
+ocr_raw: アア 敵 家 ケリ レー

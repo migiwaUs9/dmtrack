@@ -1,0 +1,3 @@
+method: ocr
+result: 航るクーー
+ocr_raw: 7 航 る クーー

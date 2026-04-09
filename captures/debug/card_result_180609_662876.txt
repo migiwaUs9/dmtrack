@@ -1,0 +1,3 @@
+method: ocr
+result: で多導欠応テンク
+ocr_raw: | で 多 導 欠 . 応 " テ ン ク

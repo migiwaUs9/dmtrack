@@ -1,0 +1,3 @@
+method: ocr
+result: 放る
+ocr_raw: 2 放 [ ) る

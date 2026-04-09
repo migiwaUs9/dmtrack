@@ -1,0 +1,3 @@
+method: ocr
+result: の二馬放デイー
+ocr_raw: の 二 馬 放 デ イー

@@ -1,0 +1,3 @@
+method: ocr
+result: 肌ビるを
+ocr_raw: 肌 ビ る を

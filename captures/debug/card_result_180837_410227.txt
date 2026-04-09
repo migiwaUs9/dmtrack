@@ -1,0 +1,3 @@
+method: ocr
+result: ーーンアデイー
+ocr_raw: ーー ン ア 42400 デ イー

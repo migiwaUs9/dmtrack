@@ -1,0 +1,3 @@
+method: ocr
+result: 断機関ゝ
+ocr_raw: : > 断 機関 ViV ゝ

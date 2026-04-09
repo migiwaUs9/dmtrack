@@ -1,0 +1,3 @@
+method: hash
+result: エメラル
+hash: f038fc01bf004fe042fe722793e57f4701fe9fbf80bb9d806000adf8603683fd
