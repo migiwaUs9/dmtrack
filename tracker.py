@@ -384,41 +384,43 @@ class GameTracker:
                 self._emit("TURN_CHANGE", player=key, turn=self.turn_count)
                 break
 
-        # カード拡大表示の検知（2段階: 差分トリガー → バナー検証）
-        card_region = rel_crop(frame, CARD_DETECT_REL)
-        diff = frame_diff_score(self.prev_card_region, card_region)
+        # カード拡大表示の検知（差分トリガーを廃止し、直接テキストバナーの存在を監視）
+        has_text = self._has_card_text(frame)
 
-        if not self.card_visible and diff > CARD_DIFF_THRESHOLD:
+        if has_text and not self.card_visible:
             self.card_visible = True
             self.card_logged = False
+            self._card_appear_time = time.time()  # アニメーション安定待ちタイマー開始
 
         if self.card_visible and not self.card_logged:
-            time.sleep(0.3)  # アニメーション安定待ち
-            stable = capture_window(self._hwnd)
-
-            # Step 1: カード名バナーにテキストが存在するか検証
-            if not self._has_card_text(stable):
-                # テキストなし → カード表示ではない（エフェクト等の誤爆）
-                self.card_logged = True  # この差分イベントはスキップ
-            else:
-                # Step 2: カードイラストのpHashで識別
-                card_name = self._identify_card(stable)
-                if card_name and card_name != "(不明)":
-                    player = self.current_player or "不明"
-                    self._emit("CARD_PLAYED", player=player, card=card_name, turn=self.turn_count)
-                    if player == "YOUR_TURN":
-                        self.my_cards.append(card_name)
-                    else:
-                        self.enemy_cards.append(card_name)
-                    # デッキ推定を更新
-                    if self.enemy_cards:
-                        deck, pct = deck_engine.infer(self.enemy_cards, self._decks)
-                        self._emit("DECK_INFERRED", deck=deck, pct=pct)
+            # テキストが継続して見えている間に0.5秒経過したら、安定したと見なしてOCR実行
+            if time.time() - getattr(self, '_card_appear_time', 0.0) > 0.5:
+                if has_text: # まだテキストが映っている場合のみ
+                    card_name = self._identify_card(frame)
+                    if card_name and card_name != "(不明)":
+                        player = self.current_player or "不明"
+                        self._emit("CARD_PLAYED", player=player, card=card_name, turn=self.turn_count)
+                        if player == "YOUR_TURN":
+                            self.my_cards.append(card_name)
+                        else:
+                            self.enemy_cards.append(card_name)
+                        # デッキ推定を更新
+                        if self.enemy_cards:
+                            deck, pct = deck_engine.infer(self.enemy_cards, self._decks)
+                            self._emit("DECK_INFERRED", deck=deck, pct=pct)
                 self.card_logged = True
 
-        if self.card_visible and diff < CARD_HIDE_THRESHOLD:
-            self.card_visible = False
-            self.card_logged = False
+        # 長時間（安定して）テキストが見えなくなったらリセット
+        # 差分（motion）が少ない(=ピタッと止まっている)のにhas_textがFalseならカードは消えたと確信できる
+        card_region = rel_crop(frame, CARD_DETECT_REL)
+        diff = frame_diff_score(self.prev_card_region, card_region) if self.prev_card_region is not None else 0
+        
+        if self.card_visible and not has_text:
+            if diff < CARD_HIDE_THRESHOLD:  # 静止しているのにテキストがない = カード閉じた
+                self.card_visible = False
+                self.card_logged = False
+                # 次の同じカードを認識できるようにハッシュ履歴を少し消す（簡略）
+                self._last_card_hash = None
 
         self.prev_card_region = card_region.copy()
 
