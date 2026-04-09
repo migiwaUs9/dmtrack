@@ -1,5 +1,8 @@
-﻿captures/*.mp4
+captures/*.mp4
 captures/frames/
+captures/*.png
+captures/debug/
+cards_unknown/*.png
 __pycache__/
 *.traineddata
 jpn.traineddata
