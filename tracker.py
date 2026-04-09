@@ -504,20 +504,16 @@ class GameTracker:
     # ── カード表示バリデーション ──────────────────
     def _has_card_text(self, frame: np.ndarray) -> bool:
         """カード名バナー領域にテキストが存在するか判定。
-        二値化マスクの黒ピクセル率(= テキスト部分)がCAD_TEXT_MIN_PCT以上ならTrue。
+        カード名バナーは「明るい背景」に「暗いテキスト」が乗っているのが特徴。
         """
         region = rel_crop(frame, CARD_NAME_REL)
-        scale = 5
-        up = cv2.resize(region, (region.shape[1] * scale, region.shape[0] * scale),
-                        interpolation=cv2.INTER_CUBIC)
-        gray = cv2.cvtColor(up, cv2.COLOR_BGR2GRAY)
-        _, binary = cv2.threshold(gray, 160, 255, cv2.THRESH_BINARY)
-        padded = cv2.copyMakeBorder(binary, 30, 30, 30, 30,
-                                    cv2.BORDER_CONSTANT, value=0)
-        inverted = cv2.bitwise_not(padded)
-
-        black_pct = (inverted < 128).sum() / inverted.size * 100
-        return black_pct >= CARD_TEXT_MIN_PCT
+        gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
+        
+        bright_pct = (gray >= 160).sum() / gray.size * 100
+        dark_pct = (gray < 160).sum() / gray.size * 100
+        
+        # 背景が極端に暗い（宇宙空間など）や、テキストがない領域を弾く
+        return bright_pct >= 30.0 and dark_pct >= 5.0
 
     # ── カード識別（pHash優先 → OCRフォールバック）──
     def _identify_card(self, frame: np.ndarray) -> str:
