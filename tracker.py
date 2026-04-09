@@ -55,10 +55,11 @@ TURN_MATCH_THRESHOLD = 0.65
 # 検知領域: 画面中央を広くカバー（自分・相手両方）
 CARD_DETECT_REL  = (0.05, 0.03, 0.80, 0.97)
 # OCR領域: カード名バナー（コスト円の右側 ～ カード右端）
-CARD_NAME_REL    = (0.42, 0.20, 0.57, 0.24)
+CARD_NAME_REL    = (0.38, 0.15, 0.66, 0.21)
 # カードイラスト領域（pHash用: カード名バナー下 ～ テキスト欄上）
-CARD_ART_REL     = (0.26, 0.27, 0.62, 0.58)
+CARD_ART_REL     = (0.34, 0.22, 0.66, 0.55)
 CARD_DIFF_THRESHOLD = 20.0
+
 CARD_HIDE_THRESHOLD = 10.0
 # カードバナーのテキスト存在チェック閾値（black% がこれ以上でカード有りと判定）
 CARD_TEXT_MIN_PCT = 3.0
