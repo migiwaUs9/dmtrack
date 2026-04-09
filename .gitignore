@@ -7,3 +7,6 @@ logs/*.csv
 .gemini/
 .vscode/
 *.lock
+scratch/
+fetch_cards.py
+*.pyc
