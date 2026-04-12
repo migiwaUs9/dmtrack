@@ -52,17 +52,17 @@ TURN_BAND_REL = (
 TURN_MATCH_THRESHOLD = 0.65
 
 # カード検知・OCR
-# 検知領域: 画面中央を広くカバー（自分・相手両方）
-CARD_DETECT_REL  = (0.05, 0.03, 0.80, 0.97)
-# OCR領域: カード名バナー（コスト円の右側 ～ カード右端）
-CARD_NAME_REL    = (0.38, 0.15, 0.66, 0.21)
-# カードイラスト領域（pHash用: カード名バナー下 ～ テキスト欄上）
-CARD_ART_REL     = (0.34, 0.22, 0.66, 0.55)
-CARD_DIFF_THRESHOLD = 20.0
-
-CARD_HIDE_THRESHOLD = 10.0
-# カードバナーのテキスト存在チェック閾値（black% がこれ以上でカード有りと判定）
-CARD_TEXT_MIN_PCT = 3.0
+# 紺色パネル検出パラメータ（HSV）
+PANEL_SEARCH_X_START = 0.55
+PANEL_HSV_LOWER      = (90, 50, 20)    # H, S, V 下限
+PANEL_HSV_UPPER      = (130, 255, 120)  # H, S, V 上限
+PANEL_MIN_W_RATIO    = 0.10
+PANEL_MIN_H_RATIO    = 0.08
+PANEL_NAME_H_RATIO   = 0.30
+# 同一カード重複検知のハミング距離閾値（これ以下なら同一カードとみなす）
+DEDUP_HASH_THRESHOLD = 8
+# テキスト検出後カード識別まで待つ安定待機時間（秒）
+CARD_SETTLE_WAIT = 0.3
 
 # manga-ocr
 MANGA_OCR_ENABLED = True  # Falseに切り替えるとTesseractフォールバック
@@ -226,9 +226,10 @@ def load_templates() -> dict[str, np.ndarray]:
 # GameTracker クラス
 # ──────────────────────────────────────────────
 class GameTracker:
-    def __init__(self, event_queue):
+    def __init__(self, event_queue, replay_path: str | None = None):
         self._queue = event_queue
         self._running = False
+        self._replay_path = replay_path  # 動画ファイルパス（Noneならライブ）
 
         # 状態
         self.state = STATE_WAITING
@@ -237,29 +238,43 @@ class GameTracker:
         self.my_cards: list[str] = []
         self.enemy_cards: list[str] = []
         self.last_turn_event: str | None = None
-        self.card_visible = False
-        self.card_logged = False
-        self.prev_card_region: np.ndarray | None = None
         self.last_bs_time = 0.0
         self.last_result_time = 0.0
         self.match_index = 0
         self.first_turn_player: str | None = None  # 先攻/後攻判定用
 
+        # カード検知の状態マシン用変数
+        # パネル検出の安定判定用
+        self._prev_panel_hashes = []
+        self._panel_stable_count = 0
+        self._known_panel_hashes = []
+
         self._hwnd: int | None = None
         self._templates: dict | None = None
         self._decks: dict = {}
-        self._all_card_names: list[str] = []  # ファジーマッチ用
-        self._hash_db: dict[str, str] = {}    # {hash文字列: カード名}
-        self._last_card_hash: str | None = None  # 同一カード重複防止
-        self._mocr = None  # manga-ocrインスタンス
+        self._all_card_names: list[str] = []
+        self._hash_db: dict[str, str] = {}
+        self._mocr = None
 
     # ── 初期化 ──────────────────────────────────
     def _init(self):
-        self._emit("STATUS", msg="ウィンドウを検索中...")
-        self._hwnd = find_hwnd(GAME_WINDOW_TITLE)
-        if not self._hwnd:
-            self._emit("STATUS", msg="デュエプレが起動していません")
-            return False
+        if self._replay_path:
+            self._emit("STATUS", msg=f"リプレイモード: {self._replay_path}")
+            self._replay_cap = cv2.VideoCapture(self._replay_path)
+            if not self._replay_cap.isOpened():
+                self._emit("STATUS", msg="動画ファイルを開けません")
+                return False
+            fps = self._replay_cap.get(cv2.CAP_PROP_FPS) or 30
+            total = int(self._replay_cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            self._replay_interval = 1.0 / fps
+            self._emit("STATUS", msg=f"動画: {total}フレーム, {fps:.1f}fps")
+        else:
+            self._replay_cap = None
+            self._emit("STATUS", msg="ウィンドウを検索中...")
+            self._hwnd = find_hwnd(GAME_WINDOW_TITLE)
+            if not self._hwnd:
+                self._emit("STATUS", msg="デュエプレが起動していません")
+                return False
 
         self._emit("STATUS", msg="テンプレート読み込み中...")
         self._templates = load_templates()
@@ -319,21 +334,41 @@ class GameTracker:
             self._running = False
             return
 
+        frame_no = 0
         while self._running:
             try:
-                frame = capture_window(self._hwnd)
+                # フレーム取得
+                if self._replay_cap:
+                    ret, frame = self._replay_cap.read()
+                    if not ret:
+                        self._emit("STATUS", msg="リプレイ終了")
+                        self._emit("LOG", msg=f"リプレイ完了: {frame_no}フレーム処理")
+                        break
+                    frame_no += 1
+                    if frame_no % 100 == 0:
+                        self._emit("LOG", msg=f"[Replay] frame #{frame_no}")
+                else:
+                    frame = capture_window(self._hwnd)
+
                 h, w = frame.shape[:2]
 
                 if self.state == STATE_WAITING:
                     self._process_waiting(frame, w, h)
-                    time.sleep(INTERVAL_WAIT)
+                    if not self._replay_cap:
+                        time.sleep(INTERVAL_WAIT)
                 else:
                     self._process_in_match(frame, w, h)
-                    time.sleep(INTERVAL_MATCH)
+                    if not self._replay_cap:
+                        time.sleep(INTERVAL_MATCH)
 
             except Exception as e:
+                import traceback
+                self._emit("LOG", msg=f"エラー: {e}\n{traceback.format_exc()}")
                 self._emit("STATUS", msg=f"エラー: {e}")
                 time.sleep(2.0)
+
+        if self._replay_cap:
+            self._replay_cap.release()
 
     def stop(self):
         self._running = False
@@ -345,6 +380,7 @@ class GameTracker:
 
     # ── 対戦中ステート ───────────────────────────
     def _process_in_match(self, frame: np.ndarray, w: int, h: int):
+        self._emit("LOG", msg=f"[Match] frame {w}x{h} state={self.state}")
         # 次の対戦開始検知（= 前の試合終了）
         if time.time() - self.last_bs_time > BS_COOLDOWN:
             if self._detect_battle_start(frame, w, h):
@@ -379,76 +415,111 @@ class GameTracker:
                     order = "先攻" if key == "YOUR_TURN" else "後攻"
                     self._emit("ORDER_DETERMINED", order=order)
                 self.last_turn_event = key
-                self.card_visible = False
-                self.card_logged = False
                 self._emit("TURN_CHANGE", player=key, turn=self.turn_count)
                 break
 
-        # カード拡大表示の検知（状態遷移による安定フレーム待機）
-        # 画面の全体的な動きの大きさを計算
-        card_region = rel_crop(frame, CARD_DETECT_REL)
-        diff = frame_diff_score(self.prev_card_region, card_region) if self.prev_card_region is not None else 0
-        self.prev_card_region = card_region.copy()
+        # ── 右パネル検出によるカード検知 ──
+        # 全パネルをハッシュで追跡し、新規パネルのみOCRする
+        panels = self._find_detail_panels(frame)
+        self._emit("LOG", msg=f"[Detect] panels={len(panels)} size={w}x{h}")
+        current_panel_hashes = []
 
-        anim_state = getattr(self, '_card_anim_state', 'idle')
+        for px, py, pw, ph in panels:
+            art_region = frame[py:py + ph, px:px + pw]
+            pil_art = Image.fromarray(cv2.cvtColor(art_region, cv2.COLOR_BGR2RGB))
+            h = imagehash.phash(pil_art, hash_size=PHASH_SIZE)
+            current_panel_hashes.append((h, px, py, pw, ph))
 
-        if anim_state == 'idle':
-            if diff > CARD_DIFF_THRESHOLD:  # 大きな動きを検知（カードが出た、エフェクト等）
-                self._card_anim_state = 'animating'
-                self._motion_start_time = time.time()
-                
-        elif anim_state == 'animating':
-            if diff < 10.0:  # 動きがピタッと止まった！
-                self._card_anim_state = 'settled'
-                self._settled_time = time.time()
-                self.card_logged = False
-            elif time.time() - self._motion_start_time > 3.0:
-                # 3秒以上動き続けていればリセット
-                self._card_anim_state = 'idle'
-                
-        elif anim_state == 'settled':
-            if not self.card_logged:
-                # 念のため物理的に一瞬(0.2秒)だけ待つ
-                if time.time() - self._settled_time > 0.2:
-                    current_screen = capture_window(self._hwnd)
-                    
-                    # 不要な暗い画像の弾き（文字領域が真っ暗ならスキップ）
-                    # ダーク文明のカードでも文字は白なので多少の明るさはある
-                    if self._has_card_text(current_screen):
-                        card_name = self._identify_card(current_screen)
-                        if card_name and card_name != "(不明)":
-                            player = self.current_player or "不明"
-                            self._emit("CARD_PLAYED", player=player, card=card_name, turn=self.turn_count)
-                            if player == "YOUR_TURN":
-                                self.my_cards.append(card_name)
-                            else:
-                                self.enemy_cards.append(card_name)
-                                
-                            if self.enemy_cards:
-                                deck, pct = deck_engine.infer(self.enemy_cards, self._decks)
-                                self._emit("DECK_INFERRED", deck=deck, pct=pct)
-                            
-                            self._card_anim_state = 'displayed'
-                        else:
-                            # カード以外（エフェクト等）だった
-                            self._card_anim_state = 'idle'
+        # 前フレームのハッシュリストと比較し安定判定
+        if not hasattr(self, '_prev_panel_hashes'):
+            self._prev_panel_hashes = []
+            self._panel_stable_count = 0
+            self._known_panel_hashes = []  # 既にOCR済みパネルのハッシュ
+
+        # 前フレームとパネル構成が同じか（全体のハッシュ距離で判定）
+        prev_h_list = [h for h, *_ in self._prev_panel_hashes]
+        curr_h_list = [h for h, *_ in current_panel_hashes]
+
+        same_as_prev = (len(prev_h_list) == len(curr_h_list) and
+                        all(a - b <= 5 for a, b in zip(curr_h_list, prev_h_list)))
+
+        if same_as_prev:
+            self._panel_stable_count += 1
+        else:
+            self._panel_stable_count = 0
+        self._prev_panel_hashes = current_panel_hashes
+
+        self._emit("LOG", msg=f"[Stable] count={self._panel_stable_count} known={len(self._known_panel_hashes)} cur={len(current_panel_hashes)}")
+
+        # 2フレーム安定したら新規パネルをチェック
+        if self._panel_stable_count >= 2 and current_panel_hashes:
+            for phash, px, py, pw, ph in current_panel_hashes:
+                # 既知パネルと照合
+                is_known = any(phash - kh <= DEDUP_HASH_THRESHOLD
+                               for kh in self._known_panel_hashes)
+                if is_known:
+                    continue
+
+                # 新規パネル発見
+                self._known_panel_hashes.append(phash)
+                name_region = frame[py:py + int(ph * PANEL_NAME_H_RATIO), px:px + pw]
+                art_region = frame[py:py + ph, px:px + pw]
+
+                if not self._has_card_text(name_region):
+                    continue
+
+                ts = str(int(time.time()))
+                if DEBUG_OCR:
+                    debug_dir = _BASE_DIR / "captures" / "debug"
+                    debug_dir.mkdir(parents=True, exist_ok=True)
+                    cv2.imwrite(str(debug_dir / f"panel_name_{ts}.png"), name_region)
+                    cv2.imwrite(str(debug_dir / f"panel_art_{ts}.png"), art_region)
+
+                card_name = self._identify_card(name_region, art_region, ts, phash)
+                self._emit("LOG", msg=f"[OCR] panel=({px},{py}) result={card_name}")
+                if card_name and card_name != "(不明)":
+                    player = self.current_player or "不明"
+                    self._emit("CARD_PLAYED", player=player, card=card_name, turn=self.turn_count)
+                    if player == "YOUR_TURN":
+                        self.my_cards.append(card_name)
                     else:
-                        self._card_anim_state = 'idle'
-                        
-                    self.card_logged = True
-            else:
-                if diff > CARD_DIFF_THRESHOLD:
-                    self._card_anim_state = 'animating'
-                    self._motion_start_time = time.time()
-                    
-        elif anim_state == 'displayed':
-            # カードが表示中で静止している間。なにか動きがあれば閉じたとみなす
-            if diff > CARD_DIFF_THRESHOLD:
-                self._card_anim_state = 'animating'
-                self._motion_start_time = time.time()
-                self._last_card_hash = None  # 同じカードを再表示した際にも反応するようにリセット
+                        self.enemy_cards.append(card_name)
 
-    # ── バトルスタート検知 ───────────────────────
+                    if self.enemy_cards:
+                        deck, pct = deck_engine.infer(self.enemy_cards, self._decks)
+                        self._emit("DECK_INFERRED", deck=deck, pct=pct)
+
+    # ── 黒背景パネル検出 ─────────────────────────
+    # ── 紺色パネル検出 ─────────────────────────
+    def _find_detail_panels(self, frame: np.ndarray) -> list[tuple[int, int, int, int]]:
+        """右側の紺色パネルをHSV色検出で探し、(x, y, w, h) のリストを返す（y昇順）"""
+        fh, fw = frame.shape[:2]
+        x_start = int(fw * PANEL_SEARCH_X_START)
+        roi = frame[0:fh, x_start:fw]
+
+        hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+        lower = np.array(PANEL_HSV_LOWER, dtype=np.uint8)
+        upper = np.array(PANEL_HSV_UPPER, dtype=np.uint8)
+        mask = cv2.inRange(hsv, lower, upper)
+
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
+
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        min_w = int(fw * PANEL_MIN_W_RATIO)
+        min_h = int(fh * PANEL_MIN_H_RATIO)
+        panels = []
+        for cnt in contours:
+            rx, ry, rw, rh = cv2.boundingRect(cnt)
+            # 最小サイズ＋縦横比で手札欄などの誤検出を除外（高さ>幅*0.3）
+            if rw >= min_w and rh >= min_h and rh > rw * 0.3:
+                panels.append((rx + x_start, ry, rw, rh))
+
+        panels.sort(key=lambda p: p[1])
+        return panels
+
     def _detect_battle_start(self, frame: np.ndarray, w: int, h: int) -> bool:
         score = template_match(
             frame, self._templates["BATTLE_START"],
@@ -465,12 +536,11 @@ class GameTracker:
         self.my_cards = []
         self.enemy_cards = []
         self.last_turn_event = None
-        self.card_visible = False
-        self.card_logged = False
-        self.prev_card_region = None
         self.last_bs_time = time.time()
         self.first_turn_player = None
-        self._last_card_hash = None
+        self._prev_panel_hashes = []
+        self._panel_stable_count = 0
+        self._known_panel_hashes = []
         self._emit("BATTLE_START", match=self.match_index)
         self._emit("STATUS", msg=f"対戦中 (試合 #{self.match_index})")
 
@@ -528,67 +598,44 @@ class GameTracker:
             json.dump(self._hash_db, f, ensure_ascii=False, indent=2)
 
     # ── カード表示バリデーション ──────────────────
-    def _has_card_text(self, frame: np.ndarray) -> bool:
-        """カード名バナー領域にテキストが存在するか判定。
-        カード名バナーは「明るい背景」に「暗いテキスト」が乗っているのが特徴。
-        """
-        region = rel_crop(frame, CARD_NAME_REL)
+    def _has_card_text(self, region: np.ndarray) -> bool:
         gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
-        
-        bright_pct = (gray >= 160).sum() / gray.size * 100
-        dark_pct = (gray < 160).sum() / gray.size * 100
-        
-        # 背景が極端に暗い（宇宙空間など）や、テキストがない領域を弾く
-        return bright_pct >= 30.0 and dark_pct >= 5.0
+        edges = cv2.Canny(gray, 50, 150)
+        edge_pct = (edges > 0).sum() / edges.size * 100
+        return edge_pct >= 1.0
 
-    # ── カード識別（pHash優先 → OCRフォールバック）──
-    def _identify_card(self, frame: np.ndarray) -> str:
-        ts = datetime.now().strftime("%H%M%S_%f")
-
-        # カードイラスト領域を切り出してpHash計算
-        art = rel_crop(frame, CARD_ART_REL)
-        pil_art = Image.fromarray(cv2.cvtColor(art, cv2.COLOR_BGR2RGB))
-        current_hash = imagehash.phash(pil_art, hash_size=PHASH_SIZE)
-        hash_str = str(current_hash)
-
-        # 同一カードの重複検知防止
-        if hash_str == self._last_card_hash:
-            return ""
-        self._last_card_hash = hash_str
-
-        # ハッシュDBで検索
-        card_name = self._lookup_hash(current_hash)
-
+    def _identify_card(self, name_region: np.ndarray, art_region: np.ndarray,
+                       ts: str, phash: "imagehash.ImageHash") -> str:
+        """pHash(imagehashオブジェクト)でDB検索し、なければOCRフォールバック"""
+        card_name = self._lookup_hash(phash)
         if card_name:
-            if DEBUG_OCR:
-                self._save_debug(frame, ts, method="hash", result=card_name,
-                                 hash_str=hash_str)
             return card_name
 
-        # DB にない → OCRフォールバック + 未知カード画像を保存
-        card_name = self._ocr_card_name(frame, ts)
+        # DB にない → OCRフォールバック
+        card_name = self._ocr_card_name(name_region, ts)
 
-        # 未知カード画像を保存（後でラベル付け用）
-        unknown_path = UNKNOWN_DIR / f"{ts}_{hash_str[:16]}.png"
-        cv2.imwrite(str(unknown_path), art)
+        # 未知カード画像を保存（後で手動ラベル付け用）
+        hash_hex = str(phash)
+        unknown_path = UNKNOWN_DIR / f"{ts}_{hash_hex[:16]}.png"
+        cv2.imwrite(str(unknown_path), art_region)
 
-        # OCRで名前が取れたらハッシュDBに自動登録
-        if card_name and card_name != "(不明)":
-            self._hash_db[hash_str] = card_name
+        # OCRで意味のある名前のみ自動登録
+        if card_name:
+            self._hash_db[hash_hex] = card_name
             self._save_hash_db()
-            self._emit("STATUS",
-                       msg=f"新カード登録: {card_name} (DB: {len(self._hash_db)}枚)")
+            self._emit("STATUS", msg=f"新カード自動登録: {card_name} (DB: {len(self._hash_db)}枚)")
+            return card_name
 
-        return card_name or "(不明)"
+        return "(不明)"
 
-    def _lookup_hash(self, current_hash) -> str | None:
+    def _lookup_hash(self, phash: "imagehash.ImageHash") -> str | None:
         """ハッシュDBからハミング距離が閾値以内の最も近いカードを返す"""
         best_name = None
         best_dist = PHASH_THRESHOLD + 1
 
         for stored_hex, name in self._hash_db.items():
             stored_hash = imagehash.hex_to_hash(stored_hex)
-            dist = current_hash - stored_hash
+            dist = phash - stored_hash
             if dist < best_dist:
                 best_dist = dist
                 best_name = name
@@ -596,59 +643,49 @@ class GameTracker:
         return best_name
 
     # ── OCR（manga-ocr優先 / Tesseractフォールバック）──────
-    def _ocr_card_name(self, frame: np.ndarray, ts: str = "") -> str:
-        region = rel_crop(frame, CARD_NAME_REL)
-        pil_region = Image.fromarray(cv2.cvtColor(region, cv2.COLOR_BGR2RGB))
+    def _ocr_card_name(self, region: np.ndarray, ts: str | None = None) -> str | None:
+        if self._mocr is None and not MANGA_OCR_ENABLED:
+            return None
+
+        gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
+        _, bin_mask = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY)
+        inv_mask = cv2.bitwise_not(bin_mask)
+        from PIL import Image
+        pil_img = Image.fromarray(cv2.cvtColor(inv_mask, cv2.COLOR_GRAY2RGB))
 
         if self._mocr is not None:
-            # manga-ocr: 前処理不要。PILイメージをそのまま渡す
-            raw = self._mocr(pil_region)
+            raw = self._mocr(pil_img)
             method_label = "manga_ocr"
         else:
-            # Tesseract フォールバック
             import pytesseract
-            scale = 5
-            up = cv2.resize(region, (region.shape[1] * scale, region.shape[0] * scale),
-                            interpolation=cv2.INTER_CUBIC)
-            gray = cv2.cvtColor(up, cv2.COLOR_BGR2GRAY)
-            _, binary = cv2.threshold(gray, 160, 255, cv2.THRESH_BINARY)
-            padded = cv2.copyMakeBorder(binary, 30, 30, 30, 30,
-                                        cv2.BORDER_CONSTANT, value=0)
-            inverted = cv2.bitwise_not(padded)
-            raw = pytesseract.image_to_string(
-                inverted, lang="jpn", config="--psm 7 --oem 3"
-            ).strip()
+            raw = pytesseract.image_to_string(pil_img, lang="jpn", config="--psm 7").strip()
             method_label = "tesseract"
 
-        # 日本語・英数字のみ抽出
+        import re, deck_engine
         jp_only = "".join(re.findall(
-            r"[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fff"
-            r"\u3000-\u303f\uff01-\uff5e\uff66-\uff9fA-Za-z0-9]+",
+            r"[぀-ゟ゠-ヿ一-鿿　-〿！-～ｦ-ﾟA-Za-z0-9]+",
             raw
         ))
 
-        # カード名マスターでファジーマッチ補正
+        final_name = None
         if jp_only and self._all_card_names:
             corrected = deck_engine.fuzzy_correct(jp_only, self._all_card_names)
             if corrected:
-                jp_only = corrected
+                final_name = corrected
 
         if DEBUG_OCR:
-            self._save_debug(frame, ts or datetime.now().strftime("%H%M%S_%f"),
-                             method=method_label, result=jp_only, raw=raw)
+            from datetime import datetime
+            self._save_debug(region, ts or datetime.now().strftime("%H%M%S_%f"),
+                             method=method_label, result=final_name or "拒否(Garbage: " + jp_only + ")", raw=raw)
 
-        return jp_only or "(不明)"
+        return final_name
 
-    # ── デバッグ保存 ──────────────────────────────
-    def _save_debug(self, frame: np.ndarray, ts: str, method: str,
+    def _save_debug(self, name_region: np.ndarray, ts: str, method: str,
                     result: str, hash_str: str = "", raw: str = ""):
         debug_dir = _BASE_DIR / "captures" / "debug"
         debug_dir.mkdir(parents=True, exist_ok=True)
 
-        region = rel_crop(frame, CARD_NAME_REL)
-        art = rel_crop(frame, CARD_ART_REL)
-        cv2.imwrite(str(debug_dir / f"card_region_{ts}.png"), region)
-        cv2.imwrite(str(debug_dir / f"card_art_{ts}.png"), art)
+        cv2.imwrite(str(debug_dir / f"card_name_{ts}.png"), name_region)
 
         with open(str(debug_dir / f"card_result_{ts}.txt"), "w",
                   encoding="utf-8") as f:
